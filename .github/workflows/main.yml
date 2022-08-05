@@ -4,7 +4,7 @@ on:
         - main
 
 jobs:
-  Build:
+  Build and Publish:
     runs-on: ubuntu-20.04
     strategy:
         matrix:
@@ -24,6 +24,8 @@ jobs:
           image-ref: '${{ matrix.target_images }}:${{ github.sha }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
+
+
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
