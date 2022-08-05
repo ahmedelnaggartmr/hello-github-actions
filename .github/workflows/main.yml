@@ -1,5 +1,3 @@
-Name: Publish Docker Images
-
 on:
     push:
       branches:
