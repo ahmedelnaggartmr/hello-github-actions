@@ -1,12 +1,31 @@
-name: A workflow for my Hello world file
-on: push
+Name: Publish Docker Images
+
+on:
+    push:
+    branches: [ "main" ]
 
 jobs:
-  build:
-    name: Hello world action
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: ./action-a
-        with:
-          MY_NAME: "Ahmed"
+  name: Build
+  runs-on: ubuntu-20.04
+  strategy:
+      matrix:
+        target_images: [first, second, third]
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker Image(s)
+      run: |
+        docker build -f docker-images/${{ target_images }} -t ${{ target_images }}:${{ github.sha }} .
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'docker-images/${{ target_images }}:${{ github.sha }}'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
