@@ -4,7 +4,7 @@ on:
         - main
 
 jobs:
-  Build and Publish:
+  Build_and_Publish:
     runs-on: ubuntu-20.04
     strategy:
         matrix:
