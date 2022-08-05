@@ -4,12 +4,15 @@ on:
         - main
 
 jobs:
-  Build_and_Publish:
+  Build:
     runs-on: ubuntu-20.04
     strategy:
         matrix:
           target_images: [first, second, third]
         fail-fast: false
+
+    name: Build and Publish ${{ matrix.target_images }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
