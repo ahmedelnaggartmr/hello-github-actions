@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Docker Image(s)
+      - name: Build ${{ matrix.target_images }} Docker Image
         run: |
           docker build -f docker-images/${{ matrix.target_images }}/Dockerfile -t ${{ matrix.target_images }}:${{ github.sha }} .
 
