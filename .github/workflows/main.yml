@@ -16,7 +16,7 @@ jobs:
           target_images: [first, second, third]
         fail-fast: false
 
-    name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' matrix.target_images || 'Attempt matrix.target_images' }}
+    name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' && matrix.target_images || 'Attempt matrix.target_images' }}
 
     steps:
       - name: Checkout code
