@@ -32,10 +32,8 @@ jobs:
           image-ref: 'ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: '1'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        if: always()
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
@@ -46,8 +44,8 @@ jobs:
           echo $CR_PAT | docker login ghcr.io -u ahmedelnaggartmr --password-stdin
         env:
           CR_PAT: ${{ secrets.GC_TOKEN }}
-          
-      - name: Publish $ {{ matrix.target_images }}
+
+      - name: Publish ${{ matrix.target_images }}
         if: github.event_name != 'pull_request'
         run: |
           docker push ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest
