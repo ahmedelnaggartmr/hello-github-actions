@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
         matrix:
-          target_images: [first, second, third]
+          target_images: [first, second, third, fourth]
         fail-fast: false
 
     name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ' }} ${{ matrix.target_images }}
