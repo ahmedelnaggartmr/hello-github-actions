@@ -1,35 +1,33 @@
+env:
+  IMAGE_NAME: first
+
 on:
     push:
       branches:
         - main
       paths:
-        - "docker-images/**/Dockerfile"
+        - "docker-images/**/${{ env.IMAGE_NAME }}"
     pull_request:
       paths:
-        - "docker-images/**/Dockerfile"
+        - "docker-images/**/${{ env.IMAGE_NAME }}"
 
 jobs:
   Build:
     runs-on: ubuntu-20.04
-    strategy:
-        matrix:
-          target_images: [first, second, third, fourth]
-        fail-fast: false
-
-    name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ' }} ${{ matrix.target_images }}
+    name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ' }} ${{ env.IMAGE_NAME }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build ${{ matrix.target_images }} Docker Image
+      - name: Build ${{ env.IMAGE_NAME }} Docker Image
         run: |
-          docker build -f docker-images/${{ matrix.target_images }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest .
+          docker build -f docker-images/${{ env.IMAGE_NAME }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest'
+          image-ref: 'ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest'
           format: 'sarif'
           output: 'trivy-results.sarif'
 
@@ -45,8 +43,8 @@ jobs:
         env:
           CR_PAT: ${{ secrets.GC_TOKEN }}
 
-      - name: Publish ${{ matrix.target_images }}
+      - name: Publish ${{ env.IMAGE_NAME }}
         if: github.event_name != 'pull_request'
         run: |
-          docker push ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest
+          docker push ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest
       
