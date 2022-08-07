@@ -16,7 +16,7 @@ jobs:
           target_images: [first, second, third]
         fail-fast: false
 
-    name: Build and Publish ${{ matrix.target_images }}
+    name: ${{ if(github.event_name != 'pull_request') }} 'Build and Publish ${{ matrix.target_images }}' ${{ else }} 'Attempt ${{ matrix.target_images }}' ${{ endif }}
 
     steps:
       - name: Checkout code
