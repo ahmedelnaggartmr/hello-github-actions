@@ -24,12 +24,12 @@ jobs:
 
       - name: Build ${{ matrix.target_images }} Docker Image
         run: |
-          docker build -f docker-images/${{ matrix.target_images }}/Dockerfile -t ${{ matrix.target_images }}:${{ github.sha }} .
+          docker build -f docker-images/${{ matrix.target_images }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ matrix.target_images }}:${{ github.sha }}'
+          image-ref: 'ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest'
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
@@ -40,11 +40,15 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - name: Test
-        run: echo "test"
-      # - name: Login to GitHub Container Registry
-      #   run: |
-      #     echo $CR_PAT | docker login ghcr.io -u ahmedelnaggartmr --password-stdin
-      #   env:
-      #     CR_PAT: ${{ secrets.GC_TOKEN }}
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        run: |
+          echo $CR_PAT | docker login ghcr.io -u ahmedelnaggartmr --password-stdin
+        env:
+          CR_PAT: ${{ secrets.GC_TOKEN }}
+          
+      - name: Publish $ {{ matrix.target_images }}
+        if: github.event_name != 'pull_request'
+        run: |
+          docker push ghcr.io/ahmedelnaggartmr/${{ matrix.target_images }}:latest
       
