@@ -69,4 +69,4 @@ jobs:
           context: .
           file: ./docker-images/${{env.IMAGE_NAME}}/Dockerfile
           push: true
-          tags: meta.tags
+          tags: ${{ steps.meta.outputs.tags }}
