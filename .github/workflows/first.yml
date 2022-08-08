@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build $env.IMAGE_NAME Docker Image
+      - name: Build ${{env.IMAGE_NAME}} Image
         run: |
           docker build -f docker-images/${{ env.IMAGE_NAME }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest .
 
@@ -43,7 +43,7 @@ jobs:
         env:
           CR_PAT: ${{ secrets.GC_TOKEN }}
 
-      - name: Publish $env.IMAGE_NAME
+      - name: Publish ${{env.IMAGE_NAME}}
         if: github.event_name != 'pull_request'
         run: |
           docker push ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest
