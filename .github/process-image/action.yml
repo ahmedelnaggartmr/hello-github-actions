@@ -1,0 +1,55 @@
+name: "Process Docker Image"
+description: "Handles the building, security scanning, and publishing of a Docker image"
+author: "octocat@github.com"
+
+inputs:
+  IMAGE_NAME:
+    description: "The name of the image to process. This must be the exact same as the name of the directory in docker-images"
+    required: true
+    default: "World"
+  PUBLISH_IMAGE:
+    description: "Whether or not to publish the Docker image to the GitHub Container Registry"
+    default: false
+  GHCR_TOKEN:
+    description: "The PAT Token to use to publish the Docker Image"
+  
+
+runs:
+  using: "composite"
+
+jobs:
+  Build:
+    runs-on: ubuntu-20.04
+    name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ' }} 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build ${{env.IMAGE_NAME}} Image
+        run: |
+          docker build -f docker-images/${{ env.IMAGE_NAME }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        run: |
+          echo $CR_PAT | docker login ghcr.io -u ahmedelnaggartmr --password-stdin
+        env:
+          CR_PAT: ${{ secrets.GC_TOKEN }}
+
+      - name: Publish ${{env.IMAGE_NAME}}
+        if: github.event_name != 'pull_request'
+        run: |
+          docker push ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest
