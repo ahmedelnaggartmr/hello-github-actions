@@ -16,7 +16,7 @@ jobs:
     env:
       IMAGE_NAME: $env.GIMAGE_NAME
     runs-on: ubuntu-20.04
-    name: ${{ (github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ') && env.IMAGE_NAME }}
+    name: ${{ (github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ') && $IMAGE_NAME }}
 
     steps:
       - name: Checkout code
