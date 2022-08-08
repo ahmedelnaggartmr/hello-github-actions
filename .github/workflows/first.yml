@@ -24,6 +24,7 @@ jobs:
       - name: Build Docker Image
         uses: docker/build-push-action@v3
         with:
+          file: ./docker-images/${{env.IMAGE_NAME}}/Dockerfile
           context: .
           load: true
           tags: ghcr.io/ahmedelnaggartmr/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest
@@ -66,6 +67,6 @@ jobs:
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          file: ./docker-images/${{env.IMAGE_NAME}}/Dockerfile
           push: true
           tags: meta.tags
