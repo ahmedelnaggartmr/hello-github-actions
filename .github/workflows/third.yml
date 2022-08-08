@@ -1,15 +1,15 @@
-env:
-  IMAGE_NAME: third
-
 on:
     push:
       branches:
         - main
       paths:
-        - "docker-images/**/${{ env.IMAGE_NAME }}/Dockerfile"
+        - "docker-images/third/Dockerfile"
     pull_request:
       paths:
-        - "docker-images/${{ env.IMAGE_NAME }}/Dockerfile"
+        - "docker-images/third/Dockerfile"
+
+env:
+  IMAGE_NAME: third
 
 jobs:
   Build:

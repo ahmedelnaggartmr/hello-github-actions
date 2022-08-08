@@ -1,15 +1,15 @@
-env:
-  IMAGE_NAME: first
-
 on:
     push:
       branches:
         - main
       paths:
-        - "docker-images/**/${{ env.IMAGE_NAME }}/Dockerfile"
+        - "docker-images/first/Dockerfile"
     pull_request:
       paths:
-        - "docker-images/${{ env.IMAGE_NAME }}/Dockerfile"
+        - "docker-images/first/Dockerfile"
+
+env:
+  IMAGE_NAME: first
 
 jobs:
   Build:
