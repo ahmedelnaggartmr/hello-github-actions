@@ -14,20 +14,20 @@ env:
 jobs:
   Build:
     runs-on: ubuntu-20.04
-    name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ' }} ${{ IMAGE_NAME }}
+    name: ${{ github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ' }} ${{ env.IMAGE_NAME }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build ${{ IMAGE_NAME }} Docker Image
+      - name: Build ${{ env.IMAGE_NAME }} Docker Image
         run: |
-          docker build -f docker-images/${{ IMAGE_NAME }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ IMAGE_NAME }}:latest .
+          docker build -f docker-images/${{ env.IMAGE_NAME }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/ahmedelnaggartmr/${{ IMAGE_NAME }}:latest'
+          image-ref: 'ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest'
           format: 'sarif'
           output: 'trivy-results.sarif'
 
@@ -43,7 +43,7 @@ jobs:
         env:
           CR_PAT: ${{ secrets.GC_TOKEN }}
 
-      - name: Publish ${{ IMAGE_NAME }}
+      - name: Publish ${{ env.IMAGE_NAME }}
         if: github.event_name != 'pull_request'
         run: |
-          docker push ghcr.io/ahmedelnaggartmr/${{ IMAGE_NAME }}:latest
+          docker push ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest
