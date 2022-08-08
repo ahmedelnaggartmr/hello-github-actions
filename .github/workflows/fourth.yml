@@ -22,7 +22,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -f docker-images/${{ env.IMAGE_NAME }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest .
+          docker build -f docker-images/${{ env.IMAGE_NAME }}/Dockerfile -t ghcr.io/ahmedelnaggartmr/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -46,4 +46,4 @@ jobs:
       - name: Publish Docker Image
         if: github.event_name != 'pull_request'
         run: |
-          docker push ghcr.io/ahmedelnaggartmr/${{ env.IMAGE_NAME }}:latest
+          docker push ghcr.io/ahmedelnaggartmr/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest
