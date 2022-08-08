@@ -10,6 +10,7 @@ on:
 
 env:
   IMAGE_NAME: first
+  REGISTRY: ghcr.io
 
 jobs:
   Build:
@@ -21,13 +22,18 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Docker Image
-        run: |
-          docker build -f docker-images/${{ env.IMAGE_NAME }}/Dockerfile -t ghcr.io/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest .
+        uses: docker/build-push-action@v3
+        with:
+          file: ./docker-images/${{env.IMAGE_NAME}}/Dockerfile
+          context: .
+          load: true
+          tags: ghcr.io/ahmedelnaggartmr/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest
+
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest'
+          image-ref: 'ghcr.io/ahmedelnaggartmr/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest'
           format: 'sarif'
           output: 'trivy-results.sarif'
 
@@ -36,14 +42,29 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - name: Login to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        run: |
-          echo $CR_PAT | docker login ghcr.io -u ahmedelnaggartmr --password-stdin
-        env:
-          CR_PAT: ${{ secrets.GC_TOKEN }}
 
-      - name: Publish Docker Image
-        if: github.event_name != 'pull_request'
-        run: |
-          docker push ghcr.io/${{github.event.repository.name}}/${{ env.IMAGE_NAME }}:latest
+      - name: Log in to the Github Container registry
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GC_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-,suffix=,format=short,priority=100
+          labels: |
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+# org.opencontainers.image.description=Build Infrastructure Agent Image
+
+      - name: Build and push Docker image to Github Container registry
+        uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94
+        with:
+          context: .
+          file: ./docker-images/${{env.IMAGE_NAME}}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
