@@ -6,10 +6,10 @@ on:
       branches:
         - main
       paths:
-        - "docker-images/**/${{ env.IMAGE_NAME }}/Dockerfile"
+        - "docker-images/${{ env.IMAGE_NAME }}/Dockerfile"
     pull_request:
       paths:
-        - "docker-images/${{ env.IMAGE_NAME }}/Dockerfile"
+        - "docker-images/fourth/Dockerfile"
 
 jobs:
   Build:
