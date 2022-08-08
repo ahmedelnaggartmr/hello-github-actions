@@ -9,10 +9,12 @@ on:
         - "docker-images/first/Dockerfile"
 
 env:
-  IMAGE_NAME: first
+  GIMAGE_NAME: first
 
 jobs:
   Build:
+    env:
+      IMAGE_NAME: $env.GIMAGE_NAME
     runs-on: ubuntu-20.04
     name: ${{ (github.event_name != 'pull_request' && 'Build and Publish ' || 'Attempt ') && env.IMAGE_NAME }}
 
