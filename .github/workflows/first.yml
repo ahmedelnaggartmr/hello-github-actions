@@ -11,6 +11,7 @@ on:
 
 env:
   IMAGE_NAME: first
+  VERSION: v3
 
 jobs:
   Build:
@@ -19,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@${{ env.VERSION }}
 
       - name: Build Docker Image
         run: |
